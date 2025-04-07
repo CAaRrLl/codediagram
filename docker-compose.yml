@@ -1,5 +1,23 @@
+version: '3.8'
+
 services:
-  api:
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+      - db
+    environment:
+      - NEXT_PUBLIC_API_DEV_URL=http://backend:8000
+      - POSTGRES_URL=postgresql://postgres:postgres@db:5432/gitdiagram
+    restart: unless-stopped
+    networks:
+      - gitdiagram-network
+
+  backend:
     build: 
       context: ./backend
       dockerfile: Dockerfile
@@ -10,5 +28,32 @@ services:
     env_file:
       - .env
     environment:
-      - ENVIRONMENT=${ENVIRONMENT:-development} # Default to development if not set
+      - ENVIRONMENT=${ENVIRONMENT:-development}
+      - POSTGRES_URL=postgresql://postgres:postgres@db:5432/gitdiagram
+    depends_on:
+      - db
     restart: unless-stopped
+    networks:
+      - gitdiagram-network
+
+  db:
+    image: postgres:15-alpine
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
+    environment:
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=gitdiagram
+    ports:
+      - "5432:5432"
+    restart: unless-stopped
+    networks:
+      - gitdiagram-network
+
+networks:
+  gitdiagram-network:
+    driver: bridge
+
+volumes:
+  postgres_data:

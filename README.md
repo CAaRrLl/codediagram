@@ -101,6 +101,45 @@ pnpm dev
 
 You can now access the website at `localhost:3000` and edit the rate limits defined in `backend/app/routers/generate.py` in the generate function decorator.
 
+## 🐳 Docker Deployment (One-Click Setup)
+
+You can easily deploy all services (frontend, backend, and database) with one command using Docker:
+
+1. Make sure you have Docker and Docker Compose installed on your system
+
+2. Run the deployment script
+
+```bash
+./deploy.sh
+```
+
+The script will:
+- Check for Docker and Docker Compose installation
+- Create an `.env` file from `.env.example` if it doesn't exist
+- Build and start all containers in detached mode
+
+After deployment, you can access:
+- Frontend: http://localhost:3000
+- Backend API: http://localhost:8000
+- Database: postgresql://postgres:postgres@localhost:5432/gitdiagram
+
+To manage your deployment:
+```bash
+# View logs for all services
+docker-compose logs -f
+
+# View logs for a specific service
+docker-compose logs -f frontend
+docker-compose logs -f backend
+docker-compose logs -f db
+
+# Stop all services
+docker-compose down
+
+# Restart after making changes
+docker-compose up -d --build
+```
+
 ## Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
